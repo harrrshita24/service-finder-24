@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Service Finder</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color: white;
+}
+
+h1 { text-align:center; padding:15px; }
+
+.container { padding:20px; }
+
+input {
+    padding:10px;
+    margin:8px 5px;
+    border-radius:8px;
+    border:none;
+}
+
+#search { width:95%; max-width:400px; }
+
+.services {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+    margin-top:25px;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius:16px;
+    padding:15px;
+    transition:0.3s;
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+img {
+    width:100%;
+    height:160px;
+    object-fit:cover;
+    border-radius:12px;
+}
+
+.card p { margin:4px 0; font-size:14px; }
+
+.stars { color: gold; }
+
+button {
+    padding:7px 10px;
+    margin:4px 2px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.call {background:#00c853;color:white;}
+.whatsapp {background:#25D366;color:white;}
+.map {background:#ff9800;color:white;}
+.review {background:#6c5ce7;color:white;}
+
+button:hover { transform: scale(1.08); }
+</style>
+</head>
+
+<body>
+
+<h1>🔧 Service Finder</h1>
+
+<div class="container">
+
+<input id="search" placeholder="Search services or workers...">
+
+<h3>Add Worker</h3>
+<input id="stype" placeholder="Service Type">
+<input id="sname" placeholder="Worker Name">
+<input id="sphone" placeholder="Phone">
+<input id="slocation" placeholder="Location">
+<button onclick="addWorker()">Add</button>
+
+<div class="services" id="serviceList"></div>
+
+</div>
+
+<script>
+
+// 🔥 UPDATED SERVICES DATA
+let services = [
+
+{
+type:"Plumber",
+workers:[
+{name:"Rahul", phone:"9876543210", location:"Delhi", rating:5, img:"https://images.unsplash.com/photo-1581578731548-c64695cc6952", reviews:[]},
+{name:"Suresh", phone:"9876543215", location:"Mumbai", rating:4, img:"https://images.unsplash.com/photo-1581578731548-c64695cc6952", reviews:[]}
+]
+},
+
+{
+type:"Electrician",
+workers:[
+{name:"Amit", phone:"9876543211", location:"Mumbai", rating:4, img:"https://images.unsplash.com/photo-1581090700227-1e8e7c3c03d4", reviews:[]},
+{name:"Ravi", phone:"9876543216", location:"Pune", rating:5, img:"https://images.unsplash.com/photo-1581090700227-1e8e7c3c03d4", reviews:[]}
+]
+},
+
+{
+type:"Cleaner",
+workers:[
+{name:"Neha", phone:"9876543212", location:"Pune", rating:5, img:"https://images.unsplash.com/photo-1581578731548-c64695cc6952", reviews:[]}
+]
+},
+
+// 🆕 NEW SERVICES ADDED
+
+{
+type:"Gardener",
+workers:[
+{name:"Ramesh", phone:"9876543220", location:"Nagpur", rating:4, img:"https://images.unsplash.com/photo-1598514983318-2f64f8f4796c", reviews:[]}
+]
+},
+
+{
+type:"Maid Service",
+workers:[
+{name:"Sunita", phone:"9876543221", location:"Mumbai", rating:5, img:"https://images.unsplash.com/photo-1581578731548-c64695cc6952", reviews:[]}
+]
+},
+
+{
+type:"Carpenter",
+workers:[
+{name:"Mahesh", phone:"9876543222", location:"Delhi", rating:4, img:"https://images.unsplash.com/photo-1503387762-592deb58ef4e", reviews:[]}
+]
+},
+
+{
+type:"AC Technician",
+workers:[
+{name:"Imran", phone:"9876543223", location:"Pune", rating:5, img:"https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc", reviews:[]}
+]
+},
+
+{
+type:"Mobile Repair",
+workers:[
+{name:"Karan", phone:"9876543224", location:"Thane", rating:4, img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9", reviews:[]}
+]
+},
+
+{
+type:"Laundry",
+workers:[
+{name:"Vikas", phone:"9876543225", location:"Mumbai", rating:5, img:"https://images.unsplash.com/photo-1581578731548-c64695cc6952", reviews:[]}
+]
+},
+
+{
+type:"Painter",
+workers:[
+{name:"Arjun", phone:"9876543226", location:"Delhi", rating:4, img:"https://images.unsplash.com/photo-1503387762-592deb58ef4e", reviews:[]}
+]
+}
+
+];
+
+// DISPLAY FUNCTION (same)
+function display(){
+    serviceList.innerHTML="";
+    let searchVal = search.value.toLowerCase();
+
+    services.forEach((service,si)=>{
+
+        service.workers.forEach((w,wi)=>{
+
+            if(w.name.toLowerCase().includes(searchVal) || service.type.toLowerCase().includes(searchVal)){
+
+                let reviewsHTML = w.reviews.map(r=>"<p>💬 "+r+"</p>").join("");
+
+                let card = document.createElement("div");
+                card.className="card";
+
+                card.innerHTML=`
+                <img src="${w.img}">
+                <h3>${w.name}</h3>
+                <p><b>${service.type}</b></p>
+                <p class="stars">${"⭐".repeat(w.rating)}</p>
+                <p>📍 ${w.location}</p>
+                <p>📞 ${w.phone}</p>
+
+                ${reviewsHTML}
+
+                <button class="call" onclick="call('${w.phone}')">Call</button>
+                <button class="whatsapp" onclick="wa('${w.phone}')">WhatsApp</button>
+                <button class="map" onclick="map('${w.location}')">Map</button>
+                <button class="review" onclick="addReview(${si},${wi})">Review</button>
+                `;
+
+                serviceList.appendChild(card);
+            }
+        });
+
+    });
+}
+
+// FUNCTIONS
+function call(p){ location.href="tel:"+p; }
+function wa(p){ window.open("https://wa.me/"+p); }
+function map(loc){ window.open("https://www.google.com/maps/search/"+loc); }
+
+function addReview(si,wi){
+    let r = prompt("Write review:");
+    if(r){
+        services[si].workers[wi].reviews.push(r);
+        display();
+    }
+}
+
+function addWorker(){
+    let type = stype.value;
+
+    let newWorker = {
+        name:sname.value,
+        phone:sphone.value,
+        location:slocation.value,
+        rating:5,
+        img:"https://images.unsplash.com/photo-1581578731548-c64695cc6952",
+        reviews:[]
+    };
+
+    let found = services.find(s=>s.type.toLowerCase() === type.toLowerCase());
+
+    if(found){
+        found.workers.push(newWorker);
+    } else {
+        services.push({type:type, workers:[newWorker]});
+    }
+
+    display();
+}
+
+search.oninput=display;
+display();
+
+</script>
+
+</body>
+</html>
